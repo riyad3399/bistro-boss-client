@@ -7,11 +7,12 @@ import "swiper/css/navigation";
 import { useEffect, useState } from "react";
 import { Rating } from "@smastrom/react-rating";
 import "@smastrom/react-rating/style.css";
+import { FaQuoteRight} from "react-icons/fa";
 
 const Testimonials = () => {
   const [reviews, setReviews] = useState([]);
   useEffect(() => {
-    fetch("reviews.json")
+    fetch("http://localhost:5000/reviews")
       .then((res) => res.json())
       .then((data) => setReviews(data));
   }, []);
@@ -26,6 +27,7 @@ const Testimonials = () => {
         {reviews.map((review) => (
           <SwiperSlide key={review._id}>
             <div className="mx-24 my-16 flex flex-col  items-center">
+              <FaQuoteRight className="text-6xl my-4"/>
               <Rating
                 style={{ maxWidth: 180 }}
                 value={review.rating}
