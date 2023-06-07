@@ -1,13 +1,13 @@
-import { useContext } from "react";
 import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../provider/AuthProvider";
 import Swal from "sweetalert2";
+import SocialLogin from "../Shared/SocialLogin/SocialLogin";
+import useAuth from "../../hooks/useAuth";
 
 const SignUp = () => {
-  const { createUser, updateUserProfile } = useContext(AuthContext);
-  const navigate = useNavigate()
+  const { createUser, updateUserProfile } = useAuth();
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -16,22 +16,33 @@ const SignUp = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log(data);
     createUser(data.email, data.password)
       .then((result) => {
         const loggedUser = result.user;
         console.log(loggedUser);
         updateUserProfile(data.name, data.photo).then(() => {
-          console.log("Update user porfile");
-          reset();
-          Swal.fire({
-            position: 'top-end',
-            icon: 'success',
-            title: 'User created successful',
-            showConfirmButton: false,
-            timer: 1500
+          const saveCart = { name: data.name, email: data.email };
+          fetch("https://bistro-boss-server-riyad3399.vercel.app/users", {
+            method: "POST",
+            headers: {
+              "content-type": "application/json",
+            },
+            body: JSON.stringify(saveCart),
           })
-          navigate('/')
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.insertedId) {
+                reset();
+                Swal.fire({
+                  position: "top-end",
+                  icon: "success",
+                  title: "User created successful",
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+                navigate("/");
+              }
+            });
         });
       })
       .catch((error) => {
@@ -132,6 +143,7 @@ const SignUp = () => {
                 Go to LOgin
               </Link>
             </p>
+            <SocialLogin></SocialLogin>
           </div>
         </div>
       </div>
